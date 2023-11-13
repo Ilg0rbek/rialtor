@@ -12,11 +12,13 @@ export const register = async (req: Request, res: Response) => {
     const findUser: IUser[] = await UserModel.find({ username });
 
     if (findUser[0]?.username === username)
-      return res.send({ msg: "User is already exits or username not unique" });
+      return res
+        .status(409)
+        .send({ msg: "User is already exits or username not unique" });
 
     await UserModel.create({ username, password: hashPassword, email });
 
-    return res.status(201).send({ msg: "User is registered" });
+    return res.status(201).send({ success: true, msg: "User is registered" });
   } catch (error: any) {
     console.log(error.message);
   }
@@ -28,7 +30,8 @@ export const login = async (req: Request, res: Response) => {
   try {
     const findUser: IUser[] = await UserModel.find({ username });
 
-    if (!findUser.length) return res.send({ msg: "User not found" });
+    if (!findUser.length)
+      return res.status(401).send({ msg: "User not found" });
 
     const passwordMatch = bycrpt.compareSync(password, findUser[0].password);
 
