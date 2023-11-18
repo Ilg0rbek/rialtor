@@ -12,13 +12,14 @@ export const register = async (req: Request, res: Response) => {
     const findUser: IUser[] = await UserModel.find({ username });
 
     if (findUser[0]?.username === username)
-      return res
-        .status(409)
-        .send({ msg: "User is already exits or username not unique" });
+      return res.send({
+        status: 409,
+        msg: "User is already exits or username not unique",
+      });
 
     await UserModel.create({ username, password: hashPassword, email });
 
-    return res.status(201).send({ success: true, msg: "User is registered" });
+    return res.status(201).send({ status: 200, msg: "User is registered" });
   } catch (error: any) {
     console.log(error.message);
   }
@@ -31,15 +32,20 @@ export const login = async (req: Request, res: Response) => {
     const findUser: IUser[] = await UserModel.find({ username });
 
     if (!findUser.length)
-      return res.status(401).send({ msg: "User not found" });
+      return res.send({ status: 409, msg: "User not found" });
 
     const passwordMatch = bycrpt.compareSync(password, findUser[0].password);
 
-    if (!passwordMatch) return res.send({ msg: "username or password error" });
+    if (!passwordMatch)
+      return res.send({ status: 409, msg: "username or password error" });
 
     const accessToken = generateAccessToken({ username });
 
-    return res.send({ msg: "User login succeffully", accessToken });
+    return res.send({
+      status: 200,
+      msg: "User login succeffully",
+      accessToken,
+    });
   } catch (error: any) {
     console.log(error.message);
   }

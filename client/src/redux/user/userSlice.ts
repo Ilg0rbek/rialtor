@@ -3,33 +3,56 @@ import axios from "axios";
 
 export interface UserState {
   loading: boolean;
-  data: null;
-  error: string | undefined;
+  data: {
+    status: string;
+    msg: string;
+  };
+  error: any;
 }
 
 const initialState: UserState = {
   loading: false,
-  data: null,
-  error: undefined,
+  data: {
+    status: "",
+    msg: "",
+  },
+  error: "",
 };
 
-const login = createAsyncThunk("login", async (data) => {
-  try {
-    const res = await axios.post("/api/login", data);
-    return res.data;
-  } catch (error: any) {
-    return error.message;
+export const login = createAsyncThunk(
+  "login",
+  async (data: { username: string; password: string }, { rejectWithValue }) => {
+    try {
+      const res = await axios.post("http://localhost:4040/auth/login", data);
+      return res.data;
+    } catch (error: any) {
+      if (error.response && error.response.data.message) {
+        return rejectWithValue(error.response.data.message);
+      } else {
+        return rejectWithValue(error.message);
+      }
+    }
   }
-});
+);
 
-const register = createAsyncThunk("register", async (data) => {
-  try {
-    const res = await axios.post("/api/register", data);
-    return res.data;
-  } catch (error: any) {
-    return error.message;
+export const register = createAsyncThunk(
+  "register",
+  async (
+    data: { username: string; email: string; password: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      const res = await axios.post("http://localhost:4040/auth/register", data);
+      return res.data;
+    } catch (error: any) {
+      if (error.response && error.response.data.message) {
+        return rejectWithValue(error.response.data.message);
+      } else {
+        return rejectWithValue(error.message);
+      }
+    }
   }
-});
+);
 
 const userSlice = createSlice({
   name: "auth",
@@ -42,9 +65,11 @@ const userSlice = createSlice({
       })
       .addCase(login.fulfilled, (state, action) => {
         state.data = action.payload;
+        state.loading = false;
       })
       .addCase(login.rejected, (state, action) => {
-        state.error = action.error.message;
+        state.loading = false;
+        state.error = action.payload;
       })
       // register page functionality
       .addCase(register.pending, (state) => {
@@ -55,7 +80,8 @@ const userSlice = createSlice({
         state.data = action.payload;
       })
       .addCase(register.rejected, (state, action) => {
-        state.error = action.error.message;
+        state.loading = false;
+        state.error = action.payload;
       });
   },
   reducers: {},

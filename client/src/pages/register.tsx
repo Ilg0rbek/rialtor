@@ -1,15 +1,21 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../redux/hooks";
+import { register } from "../redux/user/userSlice";
 
 const Register: React.FC = () => {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     username: "",
     email: "",
     password: "",
   });
-  const [loading, setLoading] = useState<boolean>(true);
+
   const [error, setError] = useState<string>("");
+  const dispatch = useAppDispatch();
+  const state = useAppSelector((state) => state.user);
+  const { data, loading } = state;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(() => {
@@ -20,17 +26,18 @@ const Register: React.FC = () => {
     });
   };
 
-  const handleSubmit = async (e: { preventDefault: () => void }) => {
+  const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
-    try {
-      const res = await axios.post("/api/register", formData);
-      if (res.data.success) {
-        setLoading(!loading);
-      }
-    } catch (error: any) {
-      setError(error.response.data.msg);
-    }
+    dispatch(register(formData));
   };
+
+  useEffect(() => {
+    if (data.status == "200") {
+      navigate("/");
+    } else {
+      setError(data.msg);
+    }
+  }, [data, loading, error]);
 
   return (
     <div className="p-3 max-w-lg mx-auto ">
@@ -42,6 +49,7 @@ const Register: React.FC = () => {
       >
         <input
           type="text"
+          required
           placeholder="username"
           className="p-3 rounded-lg"
           name="username"
@@ -49,6 +57,7 @@ const Register: React.FC = () => {
         />
         <input
           type="email"
+          required
           placeholder="email"
           className="p-3 rounded-lg"
           name="email"
@@ -56,13 +65,14 @@ const Register: React.FC = () => {
         />
         <input
           type={"password"}
+          required
           placeholder="password"
           className="p-3 rounded-lg"
           name="password"
           onChange={handleChange}
         />
         <button className=" bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-90 disabled:opacity-80">
-          {loading ? "Register" : "Register ....."}
+          {!loading ? "Register" : "Register ....."}
         </button>
       </form>
       <div className="flex gap-2 mt-5">

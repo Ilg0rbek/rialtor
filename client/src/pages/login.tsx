@@ -1,16 +1,19 @@
-import axios from "axios";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../redux/hooks";
+import { login } from "../redux/user/userSlice";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
+
+  const dispatch = useAppDispatch();
+  const { data, loading } = useAppSelector((state) => state.user);
 
   const [formData, setFormData] = useState({
     username: "",
     password: "",
   });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<string>("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(() => {
@@ -21,19 +24,18 @@ const Login: React.FC = () => {
     });
   };
 
-  const handleSubmit = async (e: { preventDefault: () => void }) => {
+  const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
-    try {
-      setLoading(!loading);
-      const res = await axios.post("/api/login", formData);
-      if (res.data.accessToken) {
-        setLoading(!loading);
-      }
-      navigate("/");
-    } catch (error: any) {
-      setError(error.response.data.msg);
-    }
+    dispatch(login(formData));
   };
+
+  useEffect(() => {
+    if (data.status == "200") {
+      navigate("/");
+    } else {
+      setError(data.msg);
+    }
+  }, [loading, data, error]);
 
   return (
     <div className=" max-w-lg mx-auto">
@@ -61,7 +63,7 @@ const Login: React.FC = () => {
           className="p-3 rounded-lg"
         />
         <button className="p-3 rounded-lg bg-slate-700 text-white uppercase">
-          {loading ? " Log in" : "Log in ....."}
+          {!loading ? " Log in" : "Log in ....."}
         </button>
       </form>
       <div className="mt-5 flex gap-2">
