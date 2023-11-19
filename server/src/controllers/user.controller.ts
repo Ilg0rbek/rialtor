@@ -29,22 +29,24 @@ export const login = async (req: Request, res: Response) => {
   const { username, password } = req.body;
 
   try {
-    const findUser: IUser[] = await UserModel.find({ username });
+    const findUser: IUser | null = await UserModel.findOne({ username });
 
-    if (!findUser.length)
-      return res.send({ status: 409, msg: "User not found" });
+    if (!findUser) return res.send({ status: 409, msg: "User not found" });
 
-    const passwordMatch = bycrpt.compareSync(password, findUser[0].password);
+    const passwordMatch = bycrpt.compareSync(password, findUser.password);
 
     if (!passwordMatch)
       return res.send({ status: 409, msg: "username or password error" });
 
     const accessToken = generateAccessToken({ username });
 
-    return res.send({
+    //@ts-ignore
+    const { password: pass, ...rest } = findUser._doc;
+
+    return res.cookie("access_token", accessToken, { httpOnly: true }).send({
       status: 200,
       msg: "User login succeffully",
-      accessToken,
+      user: rest,
     });
   } catch (error: any) {
     console.log(error.message);

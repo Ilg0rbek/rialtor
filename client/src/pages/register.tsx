@@ -33,7 +33,7 @@ const Register: React.FC = () => {
 
   useEffect(() => {
     if (data.status == "200") {
-      navigate("/");
+      navigate("/login");
     } else {
       setError(data.msg);
     }

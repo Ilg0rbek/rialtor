@@ -67,7 +67,7 @@ const Login: React.FC = () => {
         </button>
       </form>
       <div className="mt-5 flex gap-2">
-        <span>Have not account ?</span>
+        <span>Dont have an account ?</span>
         <Link to={"/register"}>
           <span className=" text-blue-700"> Register now!</span>
         </Link>
