@@ -29,7 +29,7 @@ const Header: React.FC = () => {
               <Link to={"/about"}>About</Link>
             </li>
             <li className=" text-slate-700 hover:underline">
-              <Link to={"/login"}>Sign In</Link>
+              <Link to={"/login"}>Log In</Link>
             </li>
           </ul>
         </div>

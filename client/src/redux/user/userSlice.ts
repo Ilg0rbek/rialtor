@@ -54,6 +54,18 @@ export const register = createAsyncThunk(
   }
 );
 
+export const signinSuccess = createAsyncThunk(
+  "google/auth",
+  async (data: {
+    username: string | null;
+    email: string | null;
+    photo: string | null;
+  }) => {
+    const res = await axios.post("http://localhost:4040/auth/google", data);
+    return res.data;
+  }
+);
+
 const userSlice = createSlice({
   name: "auth",
   initialState,
@@ -80,6 +92,18 @@ const userSlice = createSlice({
         state.data = action.payload;
       })
       .addCase(register.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // google page functionality
+      .addCase(signinSuccess.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(signinSuccess.fulfilled, (state, action) => {
+        state.loading = false;
+        state.data = action.payload;
+      })
+      .addCase(signinSuccess.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

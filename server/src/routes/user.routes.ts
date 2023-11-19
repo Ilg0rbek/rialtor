@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   findAll,
+  google,
   login,
   logout,
   register,
@@ -11,5 +12,6 @@ export const router = Router();
 
 router.post("/register", register);
 router.post("/login", login);
+router.post("/google", google);
 router.post("/log-out", logout);
 router.get("/users", checkTokenExpired, findAll);

@@ -9,12 +9,12 @@ export const register = async (req: Request, res: Response) => {
   const hashPassword = bycrpt.hashSync(password, 10);
 
   try {
-    const findUser: IUser[] = await UserModel.find({ username });
+    const findUser: IUser | null = await UserModel.findOne({ username });
 
-    if (findUser[0]?.username === username)
+    if (findUser?.username === username || findUser?.email === email)
       return res.send({
         status: 409,
-        msg: "User is already exits or username not unique",
+        msg: "User is already exits",
       });
 
     await UserModel.create({ username, password: hashPassword, email });
@@ -42,8 +42,10 @@ export const login = async (req: Request, res: Response) => {
 
     //@ts-ignore
     const { password: pass, ...rest } = findUser._doc;
-
-    return res.cookie("access_token", accessToken, { httpOnly: true }).send({
+    res.cookie("access_token", accessToken, {
+      httpOnly: true,
+    });
+    return res.send({
       status: 200,
       msg: "User login succeffully",
       user: rest,
@@ -57,6 +59,54 @@ export const findAll = async (req: Request, res: Response) => {
   try {
     const data = await UserModel.find();
     return res.status(200).send({ data });
+  } catch (error: any) {
+    console.log(error.message);
+  }
+};
+
+export const google = async (req: Request, res: Response) => {
+  const { email, username } = req.body;
+
+  try {
+    const user = await UserModel.findOne({ email: req.body.email });
+
+    if (user) {
+      const token = generateAccessToken({ username });
+
+      //@ts-ignore
+      const { password: pass, ...rest } = user._doc;
+
+      res.cookie("access_token", token, { httpOnly: true }).send({
+        status: 200,
+        msg: "User login succeffully",
+        user: rest,
+      });
+    } else {
+      const generatPassword =
+        Math.random().toString(36).slice(-8) +
+        Math.random().toString(36).slice(-8);
+
+      const hashPassword = bycrpt.hashSync(generatPassword, 10);
+      const newUser = new UserModel({
+        username:
+          username.split(" ").join("").toLowerCase() +
+          Math.random().toString(36).slice(-4),
+        password: hashPassword,
+        email,
+        avatar: req.body.photo,
+      });
+
+      await newUser.save();
+      const token = generateAccessToken({ username });
+
+      //@ts-ignore
+      const { password: pass, ...rest } = newUser._doc;
+      res.cookie("access_token", token, { httpOnly: true }).send({
+        status: 200,
+        msg: "User login succeffully",
+        user: rest,
+      });
+    }
   } catch (error: any) {
     console.log(error.message);
   }

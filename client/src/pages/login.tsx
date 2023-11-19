@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { login } from "../redux/user/userSlice";
+import OAuth from "../components/OAuth";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -31,7 +32,7 @@ const Login: React.FC = () => {
 
   useEffect(() => {
     if (data.status == "200") {
-      navigate("/");
+      navigate("/main");
     } else {
       setError(data.msg);
     }
@@ -39,7 +40,7 @@ const Login: React.FC = () => {
 
   return (
     <div className=" max-w-lg mx-auto">
-      <div className=" text-center my-7 text-3xl">Login</div>
+      <div className="text-3xl text-center font-semibold my-7">Login</div>
       <form
         action=""
         className=" flex flex-col gap-3"
@@ -62,9 +63,13 @@ const Login: React.FC = () => {
           name="password"
           className="p-3 rounded-lg"
         />
-        <button className="p-3 rounded-lg bg-slate-700 text-white uppercase">
+        <button
+          disabled={!loading}
+          className="p-3 rounded-lg bg-slate-700 text-white uppercase"
+        >
           {!loading ? " Log in" : "Log in ....."}
         </button>
+        <OAuth />
       </form>
       <div className="mt-5 flex gap-2">
         <span>Dont have an account ?</span>
