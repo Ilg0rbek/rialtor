@@ -6,6 +6,7 @@ import Register from "./pages/register";
 import About from "./pages/about";
 import Profile from "./pages/profile";
 import Header from "./components/Header";
+import PrivateRoute from "./components/privateroute";
 
 const App: React.FC = () => {
   return (
@@ -16,7 +17,9 @@ const App: React.FC = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/about" element={<About />} />
-        <Route path="/profile" element={<Profile />} />
+        <Route element={<PrivateRoute />}>
+          <Route path="/profile" element={<Profile />} />
+        </Route>
         <Route path="/" element={<Navigate to={"/login"} />} />
         <Route path="*" element={<h1>Page not found 404 🥶😫</h1>} />
       </Routes>
