@@ -5,6 +5,7 @@ import { useAppSelector } from "../redux/hooks";
 
 const Header: React.FC = () => {
   const { data } = useAppSelector((state) => state.user);
+  console.log(data);
 
   return (
     <div>
@@ -31,7 +32,7 @@ const Header: React.FC = () => {
             <li className="hidden sm:inline text-slate-700 hover:underline">
               <Link to={"/about"}>About</Link>
             </li>
-            {data ? (
+            {data.status == "200" ? (
               <li className=" text-slate-700 hover:underline">
                 <Link to={"/profile"}>
                   <img

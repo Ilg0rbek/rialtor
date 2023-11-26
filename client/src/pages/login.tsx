@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import {  Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { login } from "../redux/user/userSlice";
 import OAuth from "../components/OAuth";
@@ -8,6 +8,7 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
 
   const dispatch = useAppDispatch();
+  
   const { data, loading } = useAppSelector((state) => state.user);
 
   const [formData, setFormData] = useState({
@@ -28,6 +29,7 @@ const Login: React.FC = () => {
   const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
     dispatch(login(formData));
+    console.log(formData);
   };
 
   useEffect(() => {
@@ -64,7 +66,7 @@ const Login: React.FC = () => {
           className="p-3 rounded-lg"
         />
         <button
-          disabled={!loading}
+          disabled={loading}
           className="p-3 rounded-lg bg-slate-700 text-white uppercase"
         >
           {!loading ? " Log in" : "Log in ....."}
