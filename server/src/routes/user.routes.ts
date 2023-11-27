@@ -5,6 +5,7 @@ import {
   login,
   logout,
   register,
+  update,
 } from "../controllers/user.controller";
 import { checkTokenExpired } from "../middleware/auth.middleware";
 
@@ -13,5 +14,6 @@ export const router = Router();
 router.post("/register", register);
 router.post("/login", login);
 router.post("/google", google);
-router.post("/log-out", logout);
+router.patch("/update/:id", update);
+router.post("/logout", logout);
 router.get("/users", checkTokenExpired, findAll);

@@ -38,7 +38,7 @@ export const login = async (req: Request, res: Response) => {
     if (!passwordMatch)
       return res.send({ status: 409, msg: "username or password error" });
 
-    const accessToken = generateAccessToken({ username });
+    const accessToken = generateAccessToken({ username, id: findUser._id });
 
     //@ts-ignore
     const { password: pass, ...rest } = findUser._doc;
@@ -55,6 +55,8 @@ export const login = async (req: Request, res: Response) => {
   }
 };
 
+export const update = async (req: Request, res: Response) => {};
+
 export const findAll = async (req: Request, res: Response) => {
   try {
     const data = await UserModel.find();
@@ -68,14 +70,12 @@ export const google = async (req: Request, res: Response) => {
   const { email, username } = req.body;
 
   try {
-    const user = await UserModel.findOne({ email: req.body.email });
+    const findUser: IUser | null = await UserModel.findOne({ email });
 
-    if (user) {
-      const token = generateAccessToken({ username });
-
+    if (findUser) {
+      const token = generateAccessToken({ username, id: findUser._id });
       //@ts-ignore
       const { password: pass, ...rest } = user._doc;
-
       res.cookie("access_token", token, { httpOnly: true }).send({
         status: 200,
         msg: "User login succeffully",
@@ -97,11 +97,10 @@ export const google = async (req: Request, res: Response) => {
       });
 
       await newUser.save();
-      const token = generateAccessToken({ username });
 
       //@ts-ignore
       const { password: pass, ...rest } = newUser._doc;
-      res.cookie("access_token", token, { httpOnly: true }).send({
+      res.send({
         status: 200,
         msg: "User login succeffully",
         user: rest,
@@ -114,6 +113,6 @@ export const google = async (req: Request, res: Response) => {
 
 export const logout = (req: Request, res: Response) => {};
 
-const generateAccessToken = (payload: { username: string }) => {
+const generateAccessToken = (payload: { username: string; id: string }) => {
   return jwt.sign(payload, process.env.JWT_SECRET!, { expiresIn: "10m" });
 };
