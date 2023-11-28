@@ -1,18 +1,11 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
-
-export interface UserState {
-  loading: boolean;
-  data: {
-    status: string;
-    msg: string;
-  };
-  error: any;
-}
+import { fetch } from "../../utils/url";
+import { FormData, UserState } from "../../utils/interfaces";
 
 const initialState: UserState = {
   loading: false,
   data: {
+    user: {},
     status: "",
     msg: "",
   },
@@ -23,7 +16,7 @@ export const login = createAsyncThunk(
   "login",
   async (data: { username: string; password: string }, { rejectWithValue }) => {
     try {
-      const res = await axios.post("http://localhost:4040/auth/login", data);
+      const res = await fetch.post("auth/login", data);
       return res.data;
     } catch (error: any) {
       if (error.response && error.response.data.message) {
@@ -42,7 +35,7 @@ export const register = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const res = await axios.post("http://localhost:4040/auth/register", data);
+      const res = await fetch.post("auth/register", data);
       return res.data;
     } catch (error: any) {
       if (error.response && error.response.data.message) {
@@ -56,13 +49,40 @@ export const register = createAsyncThunk(
 
 export const signinSuccess = createAsyncThunk(
   "google/auth",
-  async (data: {
-    username: string | null;
-    email: string | null;
-    photo: string | null;
-  }) => {
-    const res = await axios.post("http://localhost:4040/auth/google", data);
-    return res.data;
+  async (
+    data: {
+      username: string | null;
+      email: string | null;
+      photo: string | null;
+    },
+    { rejectWithValue }
+  ) => {
+    try {
+      const res = await fetch.post("auth/google", data);
+      return res.data;
+    } catch (error: any) {
+      if (error.response && error.response.data.message) {
+        return rejectWithValue(error.response.data.message);
+      } else {
+        return rejectWithValue(error.message);
+      }
+    }
+  }
+);
+
+export const update = createAsyncThunk(
+  "update-account",
+  async (data: { id: string; data: FormData }, { rejectWithValue }) => {
+    try {
+      const res = await fetch.patch(`auth/update/${data.id}`, data.data);
+      return res.data;
+    } catch (error: any) {
+      if (error.response && error.response.data.message) {
+        return rejectWithValue(error.response.data.message);
+      } else {
+        return rejectWithValue(error.message);
+      }
+    }
   }
 );
 
@@ -104,6 +124,18 @@ const userSlice = createSlice({
         state.data = action.payload;
       })
       .addCase(signinSuccess.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // update user account
+      .addCase(update.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(update.fulfilled, (state, action) => {
+        state.loading = false;
+        state.data = action.payload;
+      })
+      .addCase(update.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

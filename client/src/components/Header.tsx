@@ -5,7 +5,6 @@ import { useAppSelector } from "../redux/hooks";
 
 const Header: React.FC = () => {
   const { data } = useAppSelector((state) => state.user);
-  console.log(data);
 
   return (
     <div>
