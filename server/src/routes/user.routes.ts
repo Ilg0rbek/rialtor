@@ -14,6 +14,6 @@ export const router = Router();
 router.post("/register", register);
 router.post("/login", login);
 router.post("/google", google);
-router.patch("/update/:id", update);
+router.patch("/update/:id", checkTokenExpired, update);
 router.post("/logout", logout);
 router.get("/users", checkTokenExpired, findAll);

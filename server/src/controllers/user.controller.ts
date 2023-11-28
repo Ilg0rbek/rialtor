@@ -3,6 +3,7 @@ import bycrpt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { UserModel } from "../models/auth.models";
 import { IUser } from "../interfaces/auth.interface";
+import { Session } from "express-session";
 
 export const register = async (req: Request, res: Response) => {
   const { username, password, email } = req.body;
@@ -55,7 +56,14 @@ export const login = async (req: Request, res: Response) => {
   }
 };
 
-export const update = async (req: Request, res: Response) => {};
+export const update = async (req: Request, res: Response) => {
+  interface CustomSessionData extends Session {
+    userId?: string;
+  }
+  const sessionData: CustomSessionData = req.session as CustomSessionData;
+
+  return res.send("hello");
+};
 
 export const findAll = async (req: Request, res: Response) => {
   try {
@@ -111,7 +119,7 @@ export const google = async (req: Request, res: Response) => {
   }
 };
 
-export const logout = (req: Request, res: Response) => {};
+export const logout = () => {};
 
 const generateAccessToken = (payload: { username: string; id: string }) => {
   return jwt.sign(payload, process.env.JWT_SECRET!, { expiresIn: "10m" });
