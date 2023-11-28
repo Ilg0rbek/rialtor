@@ -61,6 +61,28 @@ export const update = async (req: Request, res: Response) => {
     userId?: string;
   }
   const sessionData: CustomSessionData = req.session as CustomSessionData;
+  const { id } = req.params;
+
+  if (sessionData.userId != id)
+    return res.status(401).send({ msg: "You can only update your account!" });
+
+  try {
+    if (req.body.password) {
+      req.body.password = bycrpt.hashSync(req.body.password, 10);
+    }
+
+    const updateUser = await UserModel.findByIdAndUpdate(
+      id,
+      { ...req.body },
+      { new: true }
+    );
+    //@ts-ignore
+    const { password, ...rest } = updateUser._doc;
+
+    return res.status(200).send({ data: rest });
+  } catch (error: any) {
+    console.log(error.message);
+  }
 
   return res.send("hello");
 };
