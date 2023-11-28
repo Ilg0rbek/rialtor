@@ -66,6 +66,14 @@ const Profile: React.FC = () => {
     }
   };
 
+  const handleDelete = async () => {
+    try {
+      
+    } catch (error: any) {
+      console.log(error.message);
+    }
+  };
+
   useEffect(() => {
     if (file) {
       handleUploadFile(file);
@@ -138,7 +146,9 @@ const Profile: React.FC = () => {
           {updateSuccess && "Updated successfully"}
         </p>
         <div className=" flex justify-between my-5 font-bold">
-          <span className=" text-red-700 cursor-pointer">Delete account</span>
+          <span onClick={handleDelete} className=" text-red-700 cursor-pointer">
+            Delete account
+          </span>
           <span className=" text-red-700 cursor-pointer">Sin out</span>
         </div>
         <div className=" text-green-700 text-center font-bold">Show lists</div>

@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  deleted,
   findAll,
   google,
   login,
@@ -11,9 +12,10 @@ import { checkTokenExpired } from "../middleware/auth.middleware";
 
 export const router = Router();
 
+router.get("/users", checkTokenExpired, findAll);
 router.post("/register", register);
 router.post("/login", login);
 router.post("/google", google);
-router.patch("/update/:id", checkTokenExpired, update);
 router.post("/logout", logout);
-router.get("/users", checkTokenExpired, findAll);
+router.patch("/update/:id", checkTokenExpired, update);
+router.delete("/delete/:id", checkTokenExpired, deleted);

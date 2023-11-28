@@ -141,7 +141,24 @@ export const google = async (req: Request, res: Response) => {
   }
 };
 
-export const logout = () => {};
+export const deleted = async (req: Request, res: Response) => {
+  interface CustomSessionData extends Session {
+    userId?: string;
+  }
+  const sessionData: CustomSessionData = req.session as CustomSessionData;
+  const { id } = req.params;
+  if (id != sessionData.userId)
+    return res.status(401).send({ msg: "You can only delete your account!" });
+  try {
+    await UserModel.findByIdAndDelete(id);
+    res.clearCookie("access_token");
+    return res.status(200).send({ msg: "Has been deleted your accout!" });
+  } catch (error: any) {
+    console.log(error.message);
+  }
+};
+
+export const logout = async (req: Request, res: Response) => {};
 
 const generateAccessToken = (payload: { username: string; id: string }) => {
   return jwt.sign(payload, process.env.JWT_SECRET!, { expiresIn: "10m" });
