@@ -9,6 +9,7 @@ const initialState: UserState = {
     status: "",
     msg: "",
   },
+  update: [],
   error: "",
 };
 
@@ -73,9 +74,43 @@ export const signinSuccess = createAsyncThunk(
 export const update = createAsyncThunk(
   "update-account",
   async (data: { id: string; data: FormData }, { rejectWithValue }) => {
+    console.log(data);
+
     try {
       const res = await fetch.patch(`auth/update/${data.id}`, data.data);
       return res.data;
+    } catch (error: any) {
+      if (error.response && error.response.data.message) {
+        return rejectWithValue(error.response.data.message);
+      } else {
+        return rejectWithValue(error.message);
+      }
+    }
+  }
+);
+
+export const deleted = createAsyncThunk(
+  "delete-user",
+  async (id, { rejectWithValue }) => {
+    try {
+      const res = await fetch.get(`auth/delete/${id}`);
+      return res;
+    } catch (error: any) {
+      if (error.response && error.response.data.message) {
+        return rejectWithValue(error.response.data.message);
+      } else {
+        return rejectWithValue(error.message);
+      }
+    }
+  }
+);
+
+export const signout = createAsyncThunk(
+  "sign-out",
+  async ({ rejectWithValue }: any) => {
+    try {
+      const res = await fetch.get("auth/logout");
+      return res;
     } catch (error: any) {
       if (error.response && error.response.data.message) {
         return rejectWithValue(error.response.data.message);
@@ -133,7 +168,7 @@ const userSlice = createSlice({
       })
       .addCase(update.fulfilled, (state, action) => {
         state.loading = false;
-        state.data = action.payload;
+        state.update = action.payload;
       })
       .addCase(update.rejected, (state, action) => {
         state.loading = false;

@@ -12,5 +12,6 @@ export interface UserState {
     status: string;
     msg: string;
   };
+  update: any;
   error: any;
 }

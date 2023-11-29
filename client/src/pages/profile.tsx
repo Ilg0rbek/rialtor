@@ -68,11 +68,12 @@ const Profile: React.FC = () => {
 
   const handleDelete = async () => {
     try {
-      
     } catch (error: any) {
       console.log(error.message);
     }
   };
+
+  const handleSignOut = async () => {};
 
   useEffect(() => {
     if (file) {
@@ -149,7 +150,12 @@ const Profile: React.FC = () => {
           <span onClick={handleDelete} className=" text-red-700 cursor-pointer">
             Delete account
           </span>
-          <span className=" text-red-700 cursor-pointer">Sin out</span>
+          <span
+            onClick={handleSignOut}
+            className=" text-red-700 cursor-pointer"
+          >
+            Sin out
+          </span>
         </div>
         <div className=" text-green-700 text-center font-bold">Show lists</div>
       </form>

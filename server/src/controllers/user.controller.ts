@@ -158,7 +158,14 @@ export const deleted = async (req: Request, res: Response) => {
   }
 };
 
-export const logout = async (req: Request, res: Response) => {};
+export const logout = async (req: Request, res: Response) => {
+  try {
+    res.clearCookie("access_token");
+    return res.status(200).send({ msg: "User has been logged out !" });
+  } catch (error: any) {
+    console.log(error.message);
+  }
+};
 
 const generateAccessToken = (payload: { username: string; id: string }) => {
   return jwt.sign(payload, process.env.JWT_SECRET!, { expiresIn: "10m" });
